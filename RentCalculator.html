@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rent Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #0d0d0d;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #e0e0e0;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            background-color: #1a1a1a;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 16px;
+            border: 1px solid #333;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #6c5ce7;
+            box-shadow: 0 0 10px rgba(108, 92, 231, 0.5);
+        }
+        
+        .calculate-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            background: linear-gradient(45deg, #6c5ce7, #00cec9, #6c5ce7);
+            background-size: 200% 200%;
+            color: white;
+            transition: all 0.5s ease;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+            animation: gradientAnimation 3s ease infinite;
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.6);
+        }
+        
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+        
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        .result-card {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid #333;
+            box-shadow: 0 0 20px rgba(108, 92, 231, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .result-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .result-card h2 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: #00cec9;
+        }
+        
+        .total-rent {
+            font-size: 32px;
+            font-weight: 700;
+            color: #6c5ce7;
+            text-shadow: 0 0 10px rgba(108, 92, 231, 0.5);
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            input {
+                padding: 12px;
+            }
+            
+            .calculate-btn {
+                padding: 14px;
+            }
+            
+            .total-rent {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Rent Calculator</h1>
+        
+        <div class="input-group">
+            <label for="baseFare">Base Fare (₹)</label>
+            <input type="number" id="baseFare" placeholder="Enter base fare" min="0">
+        </div>
+        
+        <div class="input-group">
+            <label for="ratePerKm">Rate per KM (₹)</label>
+            <input type="number" id="ratePerKm" placeholder="Enter rate per KM" min="0" step="0.01">
+        </div>
+        
+        <div class="input-group">
+            <label for="distance">Distance in KMs</label>
+            <input type="number" id="distance" placeholder="Enter distance" min="0" step="0.1">
+        </div>
+        
+        <button class="calculate-btn" id="calculateBtn">Calculate Rent</button>
+        
+        <div class="result-card" id="resultCard">
+            <h2>💰 Total Rent</h2>
+            <div class="total-rent" id="totalRent">₹0.00</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calculateBtn = document.getElementById('calculateBtn');
+            const baseFareInput = document.getElementById('baseFare');
+            const ratePerKmInput = document.getElementById('ratePerKm');
+            const distanceInput = document.getElementById('distance');
+            const resultCard = document.getElementById('resultCard');
+            const totalRentElement = document.getElementById('totalRent');
+            
+            calculateBtn.addEventListener('click', calculateRent);
+            
+            // Also calculate when pressing Enter in any input field
+            [baseFareInput, ratePerKmInput, distanceInput].forEach(input => {
+                input.addEventListener('keyup', function(event) {
+                    if (event.key === 'Enter') {
+                        calculateRent();
+                    }
+                });
+            });
+            
+            function calculateRent() {
+                const baseFare = parseFloat(baseFareInput.value) || 0;
+                const ratePerKm = parseFloat(ratePerKmInput.value) || 0;
+                const distance = parseFloat(distanceInput.value) || 0;
+                
+                const totalRent = baseFare + (ratePerKm * distance);
+                
+                // Format the number to show two decimal places
+                totalRentElement.textContent = `₹${totalRent.toFixed(2)}`;
+                
+                // Show the result card with animation
+                resultCard.classList.add('visible');
+            }
+        });
+    </script>
+</body>
+</html>
